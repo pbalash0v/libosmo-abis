@@ -815,6 +815,7 @@ void e1inp_misdn_init(void);
 void e1inp_dahdi_init(void);
 void e1inp_ipaccess_init(void);
 void e1inp_rs232_init(void);
+void e1inp_unixsocket_init(void);
 
 void e1inp_init(void)
 {
@@ -829,4 +830,5 @@ void e1inp_init(void)
 #endif
 	e1inp_ipaccess_init();
 	e1inp_rs232_init();
+	e1inp_unixsocket_init();
 }
