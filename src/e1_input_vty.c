@@ -38,12 +38,13 @@
 
 /* CONFIG */
 
-#define E1_DRIVER_NAMES		"(misdn|misdn_lapd|dahdi|ipa)"
+#define E1_DRIVER_NAMES		"(misdn|misdn_lapd|dahdi|ipa|unixsocket)"
 #define E1_DRIVER_HELP		"mISDN supported E1 Card (kernel LAPD)\n" \
 				"mISDN supported E1 Card (userspace LAPD)\n" \
 				"DAHDI supported E1/T1/J1 Card\n" \
 				"IPA TCP/IP input\n" \
-				"HSL TCP/IP input"
+				"HSL TCP/IP input\n" \
+				"Unix socket input\n"
 
 #define E1_LINE_HELP		"Configure E1/T1/J1 Line\n" "Line Number\n"
 
