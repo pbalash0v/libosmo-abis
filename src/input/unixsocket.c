@@ -217,18 +217,23 @@ void e1inp_unixsocket_init(void)
 
 void e1inp_ericsson_set_altc(struct e1inp_line *unixline, int superchannel)
 {
-	struct unixsocket_line *config = unixline->driver_data;
+	struct unixsocket_line *config;
 	struct msgb *msg;
+
+	if (!unixline)
+		return;
 
 	if (unixline->driver != &unixsocket_driver) {
 		LOGP(DLMI, LOGL_NOTICE, "altc is only supported by unixsocket\n");
 		return;
 	}
 
+	config = unixline->driver_data;
 	if (!config) {
 		LOGP(DLMI, LOGL_NOTICE, "e1inp driver not yet initialized.\n");
 		return;
 	}
+
 
 	msg = msgb_alloc_headroom(200, 100, "ALTTC");
 
