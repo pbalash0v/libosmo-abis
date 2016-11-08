@@ -214,3 +214,27 @@ void e1inp_unixsocket_init(void)
 	tall_unixsocket_ctx = talloc_named_const(libosmo_abis_ctx, 1, "unixsocket");
 	e1inp_driver_register(&unixsocket_driver);
 }
+
+void e1inp_ericsson_set_altc(struct e1inp_line *unixline, int superchannel)
+{
+	struct unixsocket_line *config = unixline->driver_data;
+	struct msgb *msg;
+
+	if (unixline->driver != &unixsocket_driver) {
+		LOGP(DLMI, LOGL_NOTICE, "altc is only supported by unixsocket\n");
+		return;
+	}
+
+	if (!config) {
+		LOGP(DLMI, LOGL_NOTICE, "e1inp driver not yet initialized.\n");
+		return;
+	}
+
+	msg = msgb_alloc_headroom(100, 100, "ALTTC");
+
+	/* magic */
+	msgb_put_u32(msg, 0x23004200);
+	msgb_put_u8(msg, superchannel ? 1 : 0);
+
+	unixsocket_write_msg(msg, &config->fd);
+}
