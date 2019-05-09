@@ -5,9 +5,9 @@ ABIS_LIBVERSION=6:2:0
 TRAU_LIBVERSION=3:2:1
 
 AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/include -I$(top_builddir)
-AM_CFLAGS= -Wall $(LIBOSMOCORE_CFLAGS) $(LIBOSMOGSM_CFLAGS) $(LIBOSMOVTY_CFLAGS) $(COVERAGE_CFLAGS)
+AM_CFLAGS= -Wall $(LIBOSMOCORE_CFLAGS) $(LIBOSMOGSM_CFLAGS) $(LIBOSMOVTY_CFLAGS) $(LIBOSMOE1D_CFLAGS) $(COVERAGE_CFLAGS)
 AM_LDFLAGS = $(COVERAGE_LDFLAGS)
-COMMONLIBS = $(LIBOSMOCORE_LIBS) $(LIBOSMOGSM_LIBS) $(LIBOSMOVTY_LIBS)
+COMMONLIBS = $(LIBOSMOCORE_LIBS) $(LIBOSMOGSM_LIBS) $(LIBOSMOVTY_LIBS) $(LIBOSMOE1D_LIBS)
 
 lib_LTLIBRARIES = libosmoabis.la libosmotrau.la
 
@@ -20,6 +20,7 @@ libosmoabis_la_SOURCES = init.c \
 			 subchan_demux.c \
 			 trau_frame.c \
 			 input/dahdi.c \
+			 input/e1d.c \
 			 input/ipa.c \
 			 input/ipa_keepalive.c \
 			 input/ipaccess.c \

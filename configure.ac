@@ -66,6 +66,27 @@ PKG_CHECK_MODULES(ORTP, ortp >= 0.22.0)
 
 AC_CHECK_HEADERS(dahdi/user.h,,AC_MSG_WARN(DAHDI input driver will not be built))
 
+AC_ARG_ENABLE([e1d],
+	[AS_HELP_STRING(
+		[--enable-e1d],
+		[Enable osmo-e1d driver support]
+	)],
+	[
+		ENABLE_E1D=$enableval
+	],
+	[
+		ENABLE_E1D="no"
+	])
+AS_IF([test "x$ENABLE_E1D" = "xyes"], [
+	PKG_CHECK_MODULES(LIBOSMOE1D, libosmo-e1d)
+])
+AM_CONDITIONAL(ENABLE_E1D, test "x$ENABLE_E1D" = "xyes")
+AC_SUBST(ENABLE_E1D)
+if test x"$ENABLE_E1D" = x"yes"
+then
+        AC_DEFINE([HAVE_E1D], [1], [Enable osmo-e1d driver support])
+fi
+
 AC_ARG_ENABLE(sanitize,
 	[AS_HELP_STRING(
 		[--enable-sanitize],
