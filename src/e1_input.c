@@ -459,6 +459,7 @@ void e1inp_line_put(struct e1inp_line *line)
 void
 e1inp_line_bind_ops(struct e1inp_line *line, const struct e1inp_line_ops *ops)
 {
+	LOGP(DLINP, LOGL_DEBUG, "e1inp_line_bind_ops\n");
 	line->ops = ops;
 }
 
@@ -870,9 +871,11 @@ const struct value_string e1inp_signal_names[] = {
 void e1inp_misdn_init(void);
 void e1inp_dahdi_init(void);
 void e1inp_ipaccess_init(void);
+void e1inp_ipaccess_ssl_init(void);
 void e1inp_rs232_init(void);
 void e1inp_unixsocket_init(void);
 
+//(?) initializes the lib by loading available E1 drivers + memory handling
 void e1inp_init(void)
 {
 	tall_e1inp_ctx = talloc_named_const(libosmo_abis_ctx, 1, "e1inp");
@@ -885,6 +888,7 @@ void e1inp_init(void)
 	e1inp_dahdi_init();
 #endif
 	e1inp_ipaccess_init();
+	e1inp_ipaccess_ssl_init();
 	e1inp_rs232_init();
 	e1inp_unixsocket_init();
 }

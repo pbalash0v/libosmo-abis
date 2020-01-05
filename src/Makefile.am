@@ -11,8 +11,9 @@ COMMONLIBS = $(LIBOSMOCORE_LIBS) $(LIBOSMOGSM_LIBS) $(LIBOSMOVTY_LIBS)
 
 lib_LTLIBRARIES = libosmoabis.la libosmotrau.la
 
-libosmoabis_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(ABIS_LIBVERSION)
-libosmoabis_la_LIBADD = $(COMMONLIBS)
+libosmoabis_la_CFLAGS = $(AM_CFLAGS) $(LIBOPENSSL_CFLAGS)
+libosmoabis_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(ABIS_LIBVERSION) $(LIBOPENSSL_LDFLAGS)
+libosmoabis_la_LIBADD = $(COMMONLIBS) $(LIBOPENSSL_LIBS)
 libosmoabis_la_SOURCES = init.c \
 			 e1_input.c \
 			 e1_input_vty.c \
@@ -27,10 +28,15 @@ libosmoabis_la_SOURCES = init.c \
 			 input/misdn.c \
 			 input/rs232.c \
 			 input/unixsocket.c
+			 
 if ENABLE_DAHDI
 libosmoabis_la_SOURCES += input/dahdi.c
 endif
 
+libosmoabis_la_SOURCES += input/ipa_ssl.c \
+			 input/ipaccess_ssl.c \
+ 			 input/ipa_ssl_common.c
+			 
 libosmotrau_la_CFLAGS = $(AM_CFLAGS) $(ORTP_CFLAGS)
 libosmotrau_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(TRAU_LIBVERSION)
 libosmotrau_la_LIBADD = $(COMMONLIBS) $(ORTP_LIBS)

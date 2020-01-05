@@ -11,6 +11,7 @@
 #include <osmocom/abis/subchan_demux.h>
 #include <osmocom/abis/lapd.h>
 
+
 #define NUM_E1_TS   32
 #define E1INP_USE_DEFAULT (-1)
 
@@ -176,6 +177,7 @@ struct e1inp_line_ops {
 	/* Called when a new message arrives. -EBADF must be returned if the osmo_fd in link (msg->dst) is destroyed. */
 	int	(*sign_link)(struct msgb *msg);
 };
+
 
 struct e1inp_line {
 	struct llist_head list;

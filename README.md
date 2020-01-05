@@ -1,3 +1,37 @@
+
+SSL implementation of libosmo-abis 
+=============================================
+This is an pure experimental implementation of Abis protocol over SSL.
+Please note, that this implementation could **not** be considered stable
+and working production grade software. There is no certificate checking
+performed. It has not been tested with any real GSM hardware.
+
+For testing please consider a simplest lab setup of 1 BTS (w/ 1 trx) GSM network.
+The building procedure for SSLized version of libosmoabis is almost
+the same as for plain version of libosmoabis, but you need to have OpenSSL library
+installed and generate keys and certificates.
+
+This could be done on Debian based Linux OS with:
+
+	apt install libssl-dev
+	autoreconf -fi
+	./configure
+	make 
+	sudo make install
+You also will need server and client keys and certificates.
+To generate them you should issue:
+```console
+openssl req -x509 -newkey rsa:2048 -days 3650 -nodes -keyout server-key.pem -out server-cert.pem
+openssl req -x509 -newkey rsa:2048 -days 3650 -nodes -keyout client-key.pem -out client-cert.pem
+```
+Create directory /usr/local/etc/osmocom/certs and copy generated files there.
+Note: only this filenames, file formats and location are valid, since they are hardcoded in 
+library sources.
+
+
+
+original README.md below.
+
 libosmo-abis - Osmocom Abis interface library
 =============================================
 

@@ -44,12 +44,15 @@
 #include <osmocom/core/macaddr.h>
 #include <osmocom/core/logging.h>
 #include <osmocom/core/talloc.h>
-#include <osmocom/abis/e1_input.h>
-#include <osmocom/abis/ipaccess.h>
 #include <osmocom/core/socket.h>
-#include <osmocom/abis/ipa.h>
 #include <osmocom/core/backtrace.h>
 #include <osmocom/gsm/ipa.h>
+
+#include <osmocom/abis/e1_input.h>
+#include <osmocom/abis/ipaccess.h>
+#include <osmocom/abis/ipa.h>
+
+#include <osmocom/abis/ipaccess_ssl.h>
 
 static void *tall_ipa_ctx;
 
@@ -167,7 +170,7 @@ static int ipaccess_rcvmsg(struct e1inp_line *line, struct msgb *msg,
 			}
 		} else if (bfd->priv_nr == E1INP_SIGN_RSL) {
 			struct e1inp_ts *ts;
-                        struct osmo_fd *newbfd;
+         struct osmo_fd *newbfd;
 			struct e1inp_line *new_line;
 
 			sign_link =
@@ -413,7 +416,7 @@ int ipaccess_fd_cb(struct osmo_fd *bfd, unsigned int what)
 static int ipaccess_line_update(struct e1inp_line *line);
 
 struct e1inp_driver ipaccess_driver = {
-	.name = "ipa",
+	.name = "_ipa",
 	.want_write = ts_want_write,
 	.line_update = ipaccess_line_update,
 	.close = ipaccess_close,
@@ -465,17 +468,6 @@ static void update_fd_settings(struct e1inp_line *line, int fd)
 			LOGP(DLINP, LOGL_NOTICE,
 			     "Failed to set keepalive count: %s\n",
 			     strerror(errno));
-#if defined(TCP_USER_TIMEOUT)
-                val = 1000 * line->keepalive_num_probes *
-                        line->keepalive_probe_interval +
-                        line->keepalive_idle_timeout;
-                ret = setsockopt(fd, IPPROTO_TCP, TCP_USER_TIMEOUT,
-                                 &val, sizeof(val));
-                if (ret < 0)
-                        LOGP(DLINP, LOGL_NOTICE,
-                             "Failed to set user timoeut: %s\n",
-                             strerror(errno));
-#endif
 #endif
 	}
 }
@@ -684,10 +676,8 @@ static void ipaccess_bts_updown_cb(struct ipa_client_conn *link, int up)
 {
 	struct e1inp_line *line = link->line;
 
-        if (up) {
-                update_fd_settings(line, link->ofd->fd);
-                return;
-        }
+	if (up)
+		return;
 
 	if (line->ops->sign_link_down)
 		line->ops->sign_link_down(line);
@@ -931,18 +921,27 @@ static int ipaccess_line_update(struct e1inp_line *line)
 	return ret;
 }
 
-
+//
+// e1inp_ipa_bts_rsl_connect and e1inp_ipa_bts_rsl_connect_n
+// are thin wrappers over SSLized versions in ipaccess_ssl.c
+// They are used by library user code in 
+// osmo-bts/src/common/oml.c:1327:
+//	rc = e1inp_ipa_bts_rsl_connect_n(oml_link->ts->line, inet_ntoa(in), port, trx->nr);
+// No idea yet how to refactor this with minimal code base intervention
 /* backwards compatibility */
 int e1inp_ipa_bts_rsl_connect(struct e1inp_line *line,
 			      const char *rem_addr, uint16_t rem_port)
 {
-	return e1inp_ipa_bts_rsl_connect_n(line, rem_addr, rem_port, 0);
+	return e1inp_ipa_ssl_bts_rsl_connect_n(line, rem_addr, rem_port, 0);
+	//return e1inp_ipa_bts_rsl_connect_n(line, rem_addr, rem_port, 0);
 }
 
 int e1inp_ipa_bts_rsl_connect_n(struct e1inp_line *line,
 				const char *rem_addr, uint16_t rem_port,
 				uint8_t trx_nr)
 {
+	return e1inp_ipa_ssl_bts_rsl_connect_n(line, rem_addr, rem_port, trx_nr); 
+/*
 	struct ipa_client_conn *rsl_link;
 
 	if (E1INP_SIGN_RSL+trx_nr-1 >= NUM_E1_TS) {
@@ -972,7 +971,7 @@ int e1inp_ipa_bts_rsl_connect_n(struct e1inp_line *line,
 		ipa_client_conn_destroy(rsl_link);
 		return -EIO;
 	}
-	return 0;
+	return 0;*/
 }
 
 void e1inp_ipaccess_init(void)
